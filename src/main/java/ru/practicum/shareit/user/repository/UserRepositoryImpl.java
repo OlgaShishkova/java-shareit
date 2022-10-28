@@ -1,7 +1,8 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.UserAlreadyExistException;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User create(User user) {
-        checkEmailExists(user);
+        checkIfEmailExists(user);
         user.setId(++id);
         users.put(user.getId(), user);
         return user;
@@ -25,7 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
             users.get(user.getId()).setName(user.getName());
         }
         if (user.getEmail() != null) {
-            checkEmailExists(user);
+            checkIfEmailExists(user);
             users.get(user.getId()).setEmail(user.getEmail());
         }
         return users.get(user.getId());
@@ -46,7 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
         users.remove(id);
     }
 
-    private void checkEmailExists(User user) {
+    private void checkIfEmailExists(User user) {
         if (users.values().stream()
                 .map(User::getEmail)
                 .anyMatch(email -> email.equals(user.getEmail()))) {

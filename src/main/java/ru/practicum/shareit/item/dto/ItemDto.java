@@ -4,18 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Service
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
+    private Long id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
-    private boolean available;
-    private long requestId;
+    @NotNull
+    private Boolean available;
+    private Long requestId;
 }

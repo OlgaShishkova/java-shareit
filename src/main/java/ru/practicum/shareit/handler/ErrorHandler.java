@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserAlreadyExistException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 
@@ -14,7 +15,7 @@ import javax.validation.ConstraintViolationException;
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler({UserNotFoundException.class, ItemNotFoundException.class})
     public ResponseEntity<String> handleNotFoundException(RuntimeException e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
