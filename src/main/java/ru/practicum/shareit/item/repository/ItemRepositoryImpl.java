@@ -5,6 +5,7 @@ import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
@@ -50,6 +51,28 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
+    public Optional<Item> getByItemId(Long itemId) {
+        return items.values().stream()
+                .flatMap(Collection::stream)
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst();
+    }
+
+    @Override
+    public List<Item> search(String text) {
+        if (text.isBlank()) {
+            return Collections.emptyList();
+        }
+        String textLowerCase = text.toLowerCase();
+        return items.values().stream()
+                .flatMap(Collection::stream)
+                .filter(item -> (item.getName().toLowerCase().contains(textLowerCase) ||
+                        item.getDescription().toLowerCase().contains(textLowerCase)) &&
+                        item.getAvailable().equals(true))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void delete(Long userId, Long itemId) {
         if(items.containsKey(userId)) {
             List<Item> userItems = items.get(userId);
@@ -58,8 +81,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     private long getId() {
-        long lastId = items.values()
-                .stream()
+        long lastId = items.values().stream()
                 .flatMap(Collection::stream)
                 .mapToLong(Item::getId)
                 .max()
