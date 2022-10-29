@@ -36,7 +36,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item getByItemId(Long itemId) {
-        return itemRepository.getByItemId(itemId).orElseThrow(()->
+        return itemRepository.getByItemId(itemId).orElseThrow(() ->
                 new ItemNotFoundException("Вещь не найдена"));
     }
 
@@ -52,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkIfUserExists(Long userId) {
-        if(userRepository.getById(userId).isEmpty()) {
+        if (userRepository.getById(userId).isEmpty()) {
             throw new UserNotFoundException("Пользователь не найден");
         }
     }

@@ -26,7 +26,7 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userRepository.getById(id).orElseThrow(()->
+        return userRepository.getById(id).orElseThrow(() ->
                 new UserNotFoundException("Пользователь не найден"));
     }
 
