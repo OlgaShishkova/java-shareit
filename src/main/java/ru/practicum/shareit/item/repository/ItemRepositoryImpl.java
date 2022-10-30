@@ -58,9 +58,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> search(String text) {
-        if (text.isBlank()) {
-            return Collections.emptyList();
-        }
         String textLowerCase = text.toLowerCase();
         return items.values().stream()
                 .flatMap(Collection::stream)
@@ -75,6 +72,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         if (items.containsKey(userId)) {
             List<Item> userItems = items.get(userId);
             userItems.removeIf(item -> item.getId().equals(itemId));
+            itemById.remove(itemId);
         }
     }
 

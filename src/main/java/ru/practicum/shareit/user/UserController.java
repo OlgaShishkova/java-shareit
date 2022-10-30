@@ -8,7 +8,6 @@ import ru.practicum.shareit.constraint.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,14 +29,12 @@ public class UserController {
     }
 
     @PostMapping
-    @Validated(Create.class)
-    public UserDto create(@RequestBody @Valid UserDto userDto) {
+    public UserDto create(@RequestBody @Validated(Create.class) UserDto userDto) {
         return UserMapper.toUserDto(userService.create(UserMapper.toUser(userDto)));
     }
 
     @PatchMapping("{id}")
-    @Validated(Update.class)
-    public UserDto update(@PathVariable Long id, @RequestBody @Valid UserDto userDto) {
+    public UserDto update(@PathVariable Long id, @RequestBody @Validated(Update.class) UserDto userDto) {
         userService.getById(id);
         userDto.setId(id);
         return UserMapper.toUserDto(userService.update(UserMapper.toUser(userDto)));

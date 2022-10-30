@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -27,6 +28,9 @@ public class ItemController {
 
     @GetMapping("search")
     public List<ItemDto> search(@RequestParam String text) {
+        if (text.isBlank()) {
+            return Collections.emptyList();
+        }
         return ItemMapper.toItemDto(itemService.search(text));
     }
 
