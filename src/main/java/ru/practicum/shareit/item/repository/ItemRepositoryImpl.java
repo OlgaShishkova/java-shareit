@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, List<Item>> items = new HashMap<>();
+    private final Map<Long, Item> itemById = new HashMap<>();
 
     @Override
     public Item add(Item item) {
@@ -21,28 +22,28 @@ public class ItemRepositoryImpl implements ItemRepository {
             userItems.add(item);
             return userItems;
         });
+        itemById.put(item.getUserId(), item);
         return item;
     }
 
     @Override
     public Item update(Long userId, Item item) {
         List<Item> userItems = getByUserId(userId);
-        Optional<Item> itemToUpdate = userItems.stream()
+        Item itemToUpdate = userItems.stream()
                 .filter(it -> it.getId().equals(item.getId()))
-                .findFirst();
-        if (itemToUpdate.isEmpty()) {
-            throw new ItemNotFoundException("Вещь не найдена");
+                .findFirst()
+                .orElseThrow(() ->
+                        new ItemNotFoundException("Вещь не найдена"));
+        if (item.getName() != null && !item.getName().isBlank()) {
+            itemToUpdate.setName(item.getName());
         }
-        if (item.getName() != null) {
-            itemToUpdate.get().setName(item.getName());
-        }
-        if (item.getDescription() != null) {
-            itemToUpdate.get().setDescription(item.getDescription());
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            itemToUpdate.setDescription(item.getDescription());
         }
         if (item.getAvailable() != null) {
-            itemToUpdate.get().setAvailable(item.getAvailable());
+            itemToUpdate.setAvailable(item.getAvailable());
         }
-        return itemToUpdate.get();
+        return itemToUpdate;
     }
 
     @Override
@@ -52,10 +53,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Optional<Item> getByItemId(Long itemId) {
-        return items.values().stream()
-                .flatMap(Collection::stream)
-                .filter(item -> item.getId().equals(itemId))
-                .findFirst();
+        return Optional.ofNullable(itemById.get(itemId));
     }
 
     @Override

@@ -4,23 +4,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @GetMapping
     public List<ItemDto> getByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getByUserId(userId).stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return ItemMapper.toItemDto(itemService.getByUserId(userId));
     }
 
     @GetMapping("{itemId}")
@@ -30,9 +27,7 @@ public class ItemController {
 
     @GetMapping("search")
     public List<ItemDto> search(@RequestParam String text) {
-        return itemService.search(text).stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return ItemMapper.toItemDto(itemService.search(text));
     }
 
     @PostMapping
