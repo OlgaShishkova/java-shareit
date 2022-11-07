@@ -7,6 +7,7 @@ import ru.practicum.shareit.constraint.Create;
 import ru.practicum.shareit.constraint.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 
@@ -19,13 +20,13 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAll() {
-        List<User> users = userService.getAll();
+        List<User> users = userService.findAll();
         return UserMapper.toUserDto(users);
     }
 
     @GetMapping("{id}")
-    public UserDto getById(@PathVariable Long id) {
-        return UserMapper.toUserDto(userService.getById(id));
+    public UserDto findById(@PathVariable Long id) {
+        return UserMapper.toUserDto(userService.findById(id));
     }
 
     @PostMapping
@@ -35,7 +36,7 @@ public class UserController {
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable Long id, @RequestBody @Validated(Update.class) UserDto userDto) {
-        userService.getById(id);
+        userService.findById(id);
         userDto.setId(id);
         return UserMapper.toUserDto(userService.update(UserMapper.toUser(userDto)));
     }

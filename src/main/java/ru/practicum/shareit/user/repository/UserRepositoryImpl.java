@@ -1,3 +1,4 @@
+/*
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
@@ -6,7 +7,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
-@Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private final Map<Long, User> users = new HashMap<>();
@@ -38,8 +38,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> getById(Long id) {
-        return Optional.ofNullable(users.get(id));
+    public User getById(Long id) {
+        return users.get(id);
     }
 
     @Override
@@ -55,3 +55,4 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 }
+*/

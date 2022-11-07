@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -18,19 +17,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item add(Item item) {
-        checkIfUserExists(item.getUserId());
+//        checkIfUserExists(item.getUserId());
         return itemRepository.add(item);
     }
 
     @Override
     public Item update(Long userId, Item item) {
-        checkIfUserExists(userId);
+//        checkIfUserExists(userId);
         return itemRepository.update(userId, item);
     }
 
     @Override
     public List<Item> getByUserId(Long userId) {
-        checkIfUserExists(userId);
+//        checkIfUserExists(userId);
         return itemRepository.getByUserId(userId);
     }
 
@@ -47,13 +46,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void delete(Long userId, Long itemId) {
-        checkIfUserExists(userId);
+//        checkIfUserExists(userId);
         itemRepository.delete(userId, itemId);
     }
 
-    private void checkIfUserExists(Long userId) {
-        if (userRepository.getById(userId).isEmpty()) {
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-    }
+//    private void checkIfUserExists(Long userId) {
+//        if (userRepository.getById(userId).isEmpty()) {
+//            throw new UserNotFoundException("Пользователь не найден");
+//        }
+//    }
 }
