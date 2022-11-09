@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +18,7 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getRequestId() != null ? item.getRequestId() : null
+                item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
 
@@ -26,6 +28,11 @@ public class ItemMapper {
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
+        if (itemDto.getRequestId() != null) {
+            item.setRequest(new ItemRequest());
+            item.getRequest().getRequestor().setId(itemDto.getRequestId());
+        }
+        item.setOwner(new User());
         return item;
     }
 

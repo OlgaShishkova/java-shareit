@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -17,25 +18,39 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item add(Item item) {
-//        checkIfUserExists(item.getUserId());
-        return itemRepository.add(item);
+        checkIfUserExists(item.getOwner().getId());
+        return itemRepository.save(item);
     }
 
     @Override
     public Item update(Long userId, Item item) {
-//        checkIfUserExists(userId);
-        return itemRepository.update(userId, item);
+        checkIfUserExists(userId);
+        Item itemToUpdate = itemRepository.findById(item.getId()).orElseThrow(() ->
+                new ItemNotFoundException("Вещь не найдена"));
+        if (itemToUpdate.getOwner().getId() != userId) {
+            throw new ItemNotFoundException("Вещь не найдена");
+        }
+        if (item.getName() != null && !item.getName().isBlank()) {
+            itemToUpdate.setName(item.getName());
+        }
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            itemToUpdate.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            itemToUpdate.setAvailable(item.getAvailable());
+        }
+        return itemRepository.save(itemToUpdate);
     }
 
     @Override
     public List<Item> getByUserId(Long userId) {
-//        checkIfUserExists(userId);
-        return itemRepository.getByUserId(userId);
+        checkIfUserExists(userId);
+        return itemRepository.findAllByOwnerId(userId);
     }
 
     @Override
     public Item getByItemId(Long itemId) {
-        return itemRepository.getByItemId(itemId).orElseThrow(() ->
+        return itemRepository.findById(itemId).orElseThrow(() ->
                 new ItemNotFoundException("Вещь не найдена"));
     }
 
@@ -46,13 +61,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void delete(Long userId, Long itemId) {
-//        checkIfUserExists(userId);
-        itemRepository.delete(userId, itemId);
+        checkIfUserExists(userId);
+        itemRepository.deleteById(itemId);
     }
 
-//    private void checkIfUserExists(Long userId) {
-//        if (userRepository.getById(userId).isEmpty()) {
-//            throw new UserNotFoundException("Пользователь не найден");
-//        }
-//    }
+    private void checkIfUserExists(Long userId) {
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+    }
 }
