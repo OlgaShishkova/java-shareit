@@ -18,12 +18,12 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return ItemMapper.toItemDto(itemService.getByUserId(userId));
+        return ItemMapper.toItemDto(itemService.findByUserId(userId));
     }
 
     @GetMapping("{itemId}")
     public ItemDto getByItemId(@PathVariable Long itemId) {
-        return ItemMapper.toItemDto(itemService.getByItemId(itemId));
+        return ItemMapper.toItemDto(itemService.findByItemId(itemId));
     }
 
     @GetMapping("search")

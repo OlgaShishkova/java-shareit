@@ -43,13 +43,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> getByUserId(Long userId) {
+    public List<Item> findByUserId(Long userId) {
         checkIfUserExists(userId);
         return itemRepository.findAllByOwnerId(userId);
     }
 
     @Override
-    public Item getByItemId(Long itemId) {
+    public Item findByItemId(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new ItemNotFoundException("Вещь не найдена"));
     }
