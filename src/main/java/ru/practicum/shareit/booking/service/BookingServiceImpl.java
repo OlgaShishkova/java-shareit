@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.BookingNotFoundException;
-import ru.practicum.shareit.exception.ItemIsNotAvailableException;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UnsupportedStatusException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
@@ -45,6 +42,10 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = findById(bookingId);
         if (booking.getItem().getOwner().getId() != userId) {
             throw new BookingNotFoundException("Бронирование не найдено");
+        }
+        Status currentStatus = booking.getStatus();
+        if (currentStatus == Status.APPROVED || currentStatus == Status.REJECTED) {
+            throw new StatusAlreadyChangedException("Статус уже изменен");
         }
         if(approved) {
             booking.setStatus(Status.APPROVED);

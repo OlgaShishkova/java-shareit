@@ -21,7 +21,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
-            ItemIsNotAvailableException.class, DateNotValidException.class})
+            ItemIsNotAvailableException.class, DateNotValidException.class,
+            NotAuthorisedRequestException.class, StatusAlreadyChangedException.class})
     public ResponseEntity<String> handleValidationException(RuntimeException e) {
         log.error(e.getMessage(), e);
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -2,8 +2,11 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
+import ru.practicum.shareit.item.mapper.CommentMapper;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
@@ -51,6 +54,13 @@ public class ItemController {
         Item item = ItemMapper.toItem(itemDto);
         item.setId(itemId);
         return ItemMapper.toItemDto(itemService.update(userId, item));
+    }
+
+    @PostMapping("{itemId}/comment")
+    public CommentDto add(@RequestHeader("X-Sharer-User-Id") Long userId,
+                          @Valid @RequestBody CommentDto commentDto,
+                          @PathVariable Long itemId) {
+        return CommentMapper.toCommentDto(itemService.add(userId, itemId, CommentMapper.toComment(commentDto)));
     }
 
     @DeleteMapping("{itemId}")
