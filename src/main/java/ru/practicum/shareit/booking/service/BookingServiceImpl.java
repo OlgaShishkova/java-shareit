@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
         if (currentStatus == Status.APPROVED || currentStatus == Status.REJECTED) {
             throw new StatusAlreadyChangedException("Статус уже изменен");
         }
-        if(approved) {
+        if (approved) {
             booking.setStatus(Status.APPROVED);
         } else {
             booking.setStatus(Status.REJECTED);

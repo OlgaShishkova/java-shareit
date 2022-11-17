@@ -6,8 +6,12 @@ import java.util.List;
 
 public interface BookingService {
     Booking add(Booking booking);
+
     Booking approve(Long userId, Long bookingId, Boolean approved);
+
     Booking get(Long userId, Long bookingId);
+
     List<Booking> getAll(Long userId, String state);
+
     List<Booking> getForAllItems(Long userId, String state);
 }
