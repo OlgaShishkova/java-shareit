@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.dto.BookingDtoInput;
 import ru.practicum.shareit.booking.dto.BookingDtoOutput;
 import ru.practicum.shareit.item.ItemMapper;
@@ -16,15 +17,14 @@ public class BookingMapper {
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
-                ItemMapper.toItemDto(booking.getItem()),// != null ? booking.getItem() : null,
-                UserMapper.toUserDto(booking.getBooker()),// != null ? booking.getBooker() : null,
+                ItemMapper.toItemDto(booking.getItem()),
+                UserMapper.toUserDto(booking.getBooker()),
                 booking.getStatus()
         );
     }
 
     public static Booking toBooking(BookingDtoInput bookingDto) {
         Booking booking = new Booking();
-//        booking.setId(bookingDto.getId());
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
         booking.setItem(new Item());
@@ -32,10 +32,6 @@ public class BookingMapper {
             booking.getItem().setId(bookingDto.getItemId());
         }
         booking.setBooker(new User());
-//        if (bookingDto.getBookerId() != null) {
-//            booking.getBooker().setId(bookingDto.getBookerId());
-//        }
-//        booking.setStatus(bookingDto.getStatus());
         return booking;
     }
 
@@ -43,5 +39,11 @@ public class BookingMapper {
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
+    }
+
+    public static BookingDtoForItem toBookingDtoForItem(Booking booking) {
+        return new BookingDtoForItem(
+                booking.getId(),
+                booking.getBooker().getId());
     }
 }
