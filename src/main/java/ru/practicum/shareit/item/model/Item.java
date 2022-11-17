@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.request.ItemRequest;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "items")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class Item {
     @Id
@@ -20,6 +22,7 @@ public class Item {
 
     private String description;
 
+    @Column(name = "is_available")
     private Boolean available;
 
     @ManyToOne
