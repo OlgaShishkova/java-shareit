@@ -13,6 +13,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.findById(booking.getBooker().getId());
         booking.setBooker(booker);
         Item item = itemService.findByItemId(booking.getItem().getId());
-        if (item.getOwner().getId() == booker.getId()) {
+        if (Objects.equals(item.getOwner().getId(), booker.getId())) {
             throw new ItemNotFoundException("Вещь не найдена");
         }
         if (!item.getAvailable()) {
@@ -40,7 +41,7 @@ public class BookingServiceImpl implements BookingService {
     public Booking approve(Long userId, Long bookingId, Boolean approved) {
         userService.findById(userId);
         Booking booking = findById(bookingId);
-        if (booking.getItem().getOwner().getId() != userId) {
+        if (!Objects.equals(booking.getItem().getOwner().getId(), userId)) {
             throw new BookingNotFoundException("Бронирование не найдено");
         }
         Status currentStatus = booking.getStatus();
@@ -59,8 +60,8 @@ public class BookingServiceImpl implements BookingService {
     public Booking get(Long userId, Long bookingId) {
         userService.findById(userId);
         Booking booking = findById(bookingId);
-        if (booking.getItem().getOwner().getId() != userId &&
-            booking.getBooker().getId() != userId) {
+        if (!Objects.equals(booking.getItem().getOwner().getId(), userId) &&
+                !Objects.equals(booking.getBooker().getId(), userId)) {
             throw new BookingNotFoundException("Бронирование не найдено");
         }
         return booking;
