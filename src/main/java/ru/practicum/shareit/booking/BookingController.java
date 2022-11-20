@@ -50,7 +50,7 @@ public class BookingController {
     }
 
     private void validateBookingDates(BookingDtoInput bookingDto) {
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd())) {
+        if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
             throw new DateNotValidException("Дата окончания бронирования должна быть позже даты начала");
         }
     }

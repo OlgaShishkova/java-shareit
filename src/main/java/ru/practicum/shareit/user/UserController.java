@@ -35,13 +35,8 @@ public class UserController {
 
     @PatchMapping("{id}")
     public UserDto update(@PathVariable Long id, @RequestBody @Validated(Update.class) UserDto userDto) {
-        User user = userService.findById(id);
-        if (userDto.getName() != null) {
-            user.setName(userDto.getName());
-        }
-        if (userDto.getEmail() != null) {
-            user.setEmail(userDto.getEmail());
-        }
+        User user = UserMapper.toUser(userDto);
+        user.setId(id);
         return UserMapper.toUserDto(userService.update(user));
     }
 

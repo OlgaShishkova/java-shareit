@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -19,8 +20,10 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -28,12 +31,14 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final UserService userService;
 
+    @Transactional
     @Override
     public Item add(Item item) {
         userService.findById(item.getOwner().getId());
         return itemRepository.save(item);
     }
 
+    @Transactional
     @Override
     public Item update(Long userId, Item item) {
         userService.findById(userId);
@@ -51,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             itemToUpdate.setAvailable(item.getAvailable());
         }
-        return itemRepository.save(itemToUpdate);
+        return itemToUpdate;
     }
 
     @Override
@@ -60,12 +65,18 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
         List<ItemDtoWithBookings> itemsWithBookings = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.now();
+        List<Comment> comments = commentRepository.findAllByItemIn(items);
+        List<Booking> bookings = bookingRepository.findAllByItemIn(items);
         for (Item item : items) {
             ItemDtoWithBookings itemDtoWithBookings = ItemMapper.toItemDtoWithBookings(item);
-            List<Comment> comments = commentRepository.findCommentsByItemId(item.getId());
-            itemDtoWithBookings.setComments(CommentMapper.toCommentDto(comments));
-            List<Booking> bookings = bookingRepository.findAllByItemId(item.getId());
-            findNearestBookings(itemDtoWithBookings, currentTime, bookings);
+            List<Comment> commentsForItem = comments.stream()
+                    .filter(comment -> item.getId().equals(comment.getItem().getId()))
+                    .collect(Collectors.toList());
+            itemDtoWithBookings.setComments(CommentMapper.toCommentDto(commentsForItem));
+            List<Booking> bookingsForItem = bookings.stream()
+                    .filter(booking -> item.getId().equals(booking.getItem().getId()))
+                    .collect(Collectors.toList());
+            findNearestBookings(itemDtoWithBookings, currentTime, bookingsForItem);
             itemsWithBookings.add(itemDtoWithBookings);
         }
         return itemsWithBookings;
@@ -97,12 +108,14 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.search(text);
     }
 
+    @Transactional
     @Override
     public void delete(Long userId, Long itemId) {
         userService.findById(userId);
         itemRepository.deleteById(itemId);
     }
 
+    @Transactional
     @Override
     public Comment add(Long userId, Long itemId, Comment comment) {
         User author = userService.findById(userId);
