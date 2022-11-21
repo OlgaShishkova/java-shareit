@@ -20,7 +20,9 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(readOnly = true)
@@ -65,18 +67,20 @@ public class ItemServiceImpl implements ItemService {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
         List<ItemDtoWithBookings> itemsWithBookings = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.now();
-        List<Comment> comments = commentRepository.findAllByItemIn(items);
-        List<Booking> bookings = bookingRepository.findAllByItemIn(items);
+        Map<Item, List<Booking>> bookingsByItem =
+                bookingRepository.findAllByItemIn(items)
+                        .stream()
+                        .collect(groupingBy(Booking::getItem, toList()));
+        Map<Item, List<Comment>> commentsByItem =
+                commentRepository.findAllByItemIn(items)
+                        .stream()
+                        .collect(groupingBy(Comment::getItem, toList()));
         for (Item item : items) {
             ItemDtoWithBookings itemDtoWithBookings = ItemMapper.toItemDtoWithBookings(item);
-            List<Comment> commentsForItem = comments.stream()
-                    .filter(comment -> item.getId().equals(comment.getItem().getId()))
-                    .collect(Collectors.toList());
-            itemDtoWithBookings.setComments(CommentMapper.toCommentDto(commentsForItem));
-            List<Booking> bookingsForItem = bookings.stream()
-                    .filter(booking -> item.getId().equals(booking.getItem().getId()))
-                    .collect(Collectors.toList());
-            findNearestBookings(itemDtoWithBookings, currentTime, bookingsForItem);
+            itemDtoWithBookings.setComments(CommentMapper.toCommentDto(
+                    commentsByItem.getOrDefault(item, Collections.emptyList())));
+            findNearestBookings(itemDtoWithBookings, currentTime,
+                    bookingsByItem.getOrDefault(item, Collections.emptyList()));
             itemsWithBookings.add(itemDtoWithBookings);
         }
         return itemsWithBookings;
