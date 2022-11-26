@@ -42,7 +42,10 @@ public class ItemMapper {
         item.setAvailable(itemDto.getAvailable());
         if (itemDto.getRequestId() != null) {
             item.setRequest(new ItemRequest());
-            item.getRequest().getRequestor().setId(itemDto.getRequestId());
+            item.getRequest().setId(itemDto.getRequestId());
+            User requestor = new User();
+            requestor.setId(itemDto.getRequestId());
+            item.getRequest().setRequestor(requestor);
         }
         item.setOwner(new User());
         return item;

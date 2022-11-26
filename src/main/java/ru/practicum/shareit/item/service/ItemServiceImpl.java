@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.NotAuthorisedRequestException;
+import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -15,6 +16,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -32,11 +35,17 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
+    private final ItemRequestService itemRequestService;
 
     @Transactional
     @Override
     public Item add(Item item) {
-        userService.findById(item.getOwner().getId());
+        User owner = userService.findById(item.getOwner().getId());
+        item.setOwner(owner);
+        if (item.getRequest() != null) {
+            ItemRequest itemRequest = itemRequestService.findByRequestId(item.getRequest().getId());
+            item.setRequest(itemRequest);
+        }
         return itemRepository.save(item);
     }
 
@@ -89,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item findByItemId(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
-                new ItemNotFoundException("Вещь не найдена"));
+                new RequestNotFoundException("Запрос не найден"));
     }
 
     @Override
