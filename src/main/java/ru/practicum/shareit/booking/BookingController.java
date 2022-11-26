@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoInput;
 import ru.practicum.shareit.booking.dto.BookingDtoOutput;
@@ -8,11 +9,14 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.DateNotValidException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -39,14 +43,18 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoOutput> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @RequestParam(defaultValue = "ALL") String state) {
-        return BookingMapper.toBookingDto(bookingService.getAll(userId, state));
+        @RequestParam(defaultValue = "ALL") String state,
+             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+             @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+        return BookingMapper.toBookingDto(bookingService.getAll(userId, state, from, size));
     }
 
     @GetMapping("owner")
     public List<BookingDtoOutput> getForAllItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                         @RequestParam(defaultValue = "ALL") String state) {
-        return BookingMapper.toBookingDto(bookingService.getForAllItems(userId, state));
+                                     @RequestParam(defaultValue = "ALL") String state,
+                                     @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                     @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+        return BookingMapper.toBookingDto(bookingService.getForAllItems(userId, state, from, size));
     }
 
     private void validateBookingDates(BookingDtoInput bookingDto) {

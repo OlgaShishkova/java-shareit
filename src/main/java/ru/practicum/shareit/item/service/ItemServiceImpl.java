@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -71,9 +73,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoWithBookings> findByUserId(Long userId) {
+    public List<ItemDtoWithBookings> findByUserId(Long userId, Integer from, Integer size) {
         userService.findById(userId);
-        List<Item> items = itemRepository.findAllByOwnerId(userId);
+        int page = from / size;
+        Pageable itemPage = PageRequest.of(page, size);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, itemPage);
         List<ItemDtoWithBookings> itemsWithBookings = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.now();
         Map<Item, List<Booking>> bookingsByItem =
@@ -117,8 +121,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> search(String text) {
-        return itemRepository.search(text);
+    public List<Item> search(String text, Integer from, Integer size) {
+        int page = from / size;
+        Pageable itemPage = PageRequest.of(page, size);
+        return itemRepository.search(text, itemPage);
     }
 
     @Transactional
@@ -139,7 +145,8 @@ public class ItemServiceImpl implements ItemService {
         return commentRepository.save(comment);
     }
 
-    private void findNearestBookings(ItemDtoWithBookings itemDtoWithBookings, LocalDateTime currentTime, List<Booking> bookings) {
+    private void findNearestBookings(ItemDtoWithBookings itemDtoWithBookings,
+                                     LocalDateTime currentTime, List<Booking> bookings) {
         if (bookings.size() > 0) {
             Optional<Booking> lastBooking = bookings.stream()
                     .filter(booking -> currentTime.isAfter(booking.getEnd()))
