@@ -144,7 +144,8 @@ public class BookingServiceImpl implements BookingService {
         return bookings;
     }
 
-    private Booking findById(Long id) {
+    @Override
+    public Booking findById(Long id) {
         return bookingRepository.findById(id).orElseThrow(() ->
                 new BookingNotFoundException("Бронирование не найдено"));
     }

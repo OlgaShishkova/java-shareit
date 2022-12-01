@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -50,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequest findByRequestId(Long requestId) {
         return itemRequestRepository.findById(requestId).orElseThrow(() ->
-                new ItemNotFoundException("Вещь не найдена"));
+                new RequestNotFoundException("Запрос не найден"));
     }
 
     @Override

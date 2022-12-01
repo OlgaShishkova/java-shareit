@@ -11,6 +11,8 @@ public interface BookingService {
 
     Booking get(Long userId, Long bookingId);
 
+    Booking findById(Long id);
+
     List<Booking> getAll(Long userId, String state, Integer from, Integer size);
 
     List<Booking> getForAllItems(Long userId, String state, Integer from, Integer size);

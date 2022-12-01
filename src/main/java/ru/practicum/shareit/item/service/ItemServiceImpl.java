@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.NotAuthorisedRequestException;
-import ru.practicum.shareit.exception.RequestNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -102,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item findByItemId(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
-                new RequestNotFoundException("Запрос не найден"));
+                new ItemNotFoundException("Вещь не найдена"));
     }
 
     @Override
