@@ -12,7 +12,6 @@ import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -30,25 +29,12 @@ import static org.hamcrest.Matchers.*;
 public class UserServiceTest {
     @Mock
     private UserRepository mockUserRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private final EntityManager em;
     private final UserService userService;
 
     @Test
-    void testFindByIdReturnsUser() {
-        UserService userService = new UserServiceImpl(mockUserRepository);
-        User user = new User(1L, "user", "user@email.ru");
-        Mockito
-                .when(mockUserRepository.findById(1L))
-                .thenReturn(Optional.of(user));
-        assertThat(user, equalTo(userService.findById(1L)));
-    }
-
-    @Test
     void testFindByIdReturnsException() {
-        UserService userService = new UserServiceImpl(mockUserRepository);
         Mockito
                 .when(mockUserRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -58,27 +44,9 @@ public class UserServiceTest {
         Assertions.assertEquals("Пользователь не найден", exception.getMessage());
     }
 
-    @Test
-    void testUserIsSavedWhenUpdated() {
-        UserService userService = new UserServiceImpl(mockUserRepository);
-        User userWithoutEmail = new User(2L, "userUpdated", null);
-        User user = new User(2L, "user", "user@email.ru");
-        User userUpdated = new User(2L, "userUpdated", "user@email.ru");
-        Mockito
-                .when(mockUserRepository.findById(2L))
-                .thenReturn(Optional.of(user));
-        Mockito
-                .when(mockUserRepository.save(userUpdated))
-                .thenReturn(userUpdated);
-        User userAfterUpdate = userService.update(userWithoutEmail);
-        Mockito.verify(mockUserRepository)
-                .save(userUpdated);
-        assertThat(userAfterUpdate, equalTo(userUpdated));
-    }
-
-    @Test
-    void testUserIsCreated() {
-        User user = new User(1L, "user", "user@email.ru");
+   @Test
+    void testCreateUser() {
+        User user = new User(null, "user", "user@email.ru");
         userService.create(user);
         TypedQuery<User> query = em.createQuery("Select u from User u where u.email = :email", User.class);
         User userSaved = query.setParameter("email", user.getEmail()).getSingleResult();
@@ -90,9 +58,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateUserName() {
-        User user = new User();
-        user.setName("user");
-        user.setEmail("user@email.ru");
+        User user = new User(null, "user","user@email.ru");
         User savedUser = userRepository.save(user);
         User userWithUpdatedName = new User(savedUser.getId(), "updatedUser", null);
         userService.update(userWithUpdatedName);
@@ -106,9 +72,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateUserEmail() {
-        User user = new User();
-        user.setName("user");
-        user.setEmail("user@email.ru");
+        User user = new User(null, "user","user@email.ru");
         User savedUser = userRepository.save(user);
         User userWithUpdatedEmail = new User(savedUser.getId(), null, "updatedUser@email.ru");
         userService.update(userWithUpdatedEmail);
@@ -122,9 +86,7 @@ public class UserServiceTest {
 
     @Test
     void testUpdateUserWithBlankName() {
-        User user = new User();
-        user.setName("user");
-        user.setEmail("user@email.ru");
+        User user = new User(null, "user","user@email.ru");
         User savedUser = userRepository.save(user);
         User userWithBlankName = new User(savedUser.getId(), " ", null);
         userService.update(userWithBlankName);
@@ -134,6 +96,20 @@ public class UserServiceTest {
         assertThat(userUpdated.getId(), equalTo(savedUser.getId()));
         assertThat(userUpdated.getName(), equalTo("user"));
         assertThat(userUpdated.getEmail(), equalTo("user@email.ru"));
+    }
+
+    @Test
+    void testUpdateUserNameAndEmail() {
+        User user = new User(null, "user","user@email.ru");
+        User savedUser = userRepository.save(user);
+        User updatedUser = new User(savedUser.getId(), "updatedUser", "updatedUser@email.ru");
+        userService.update(updatedUser);
+        TypedQuery<User> query = em.createQuery("Select u from User u where u.id = :id", User.class);
+        User userUpdated = query.setParameter("id", user.getId()).getSingleResult();
+
+        assertThat(userUpdated.getId(), equalTo(savedUser.getId()));
+        assertThat(userUpdated.getName(), equalTo("updatedUser"));
+        assertThat(userUpdated.getEmail(), equalTo("updatedUser@email.ru"));
     }
 
     @Test
@@ -154,12 +130,12 @@ public class UserServiceTest {
         User user1 = new User(null, "user1", "user1@email.ru");
         User user2 = new User(null, "user2", "user2@email.ru");
         User user3 = new User(null, "user3", "user3@email.ru");
-        User savedUser1 = userRepository.save(user1);
-        User savedUser2 = userRepository.save(user2);
-        User savedUser3 = userRepository.save(user3);
-        User user = userService.findById(savedUser2.getId());
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+        User user = userService.findById(user2.getId());
 
-        assertThat(user, equalTo(savedUser2));
+        assertThat(user, equalTo(user2));
     }
 
     @Test
