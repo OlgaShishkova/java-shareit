@@ -66,7 +66,7 @@ public class ItemController {
     public CommentDto add(@RequestHeader("X-Sharer-User-Id") Long userId,
                           @Valid @RequestBody CommentDto commentDto,
                           @PathVariable Long itemId) {
-        return CommentMapper.toCommentDto(itemService.add(userId, itemId, CommentMapper.toComment(commentDto)));
+        return CommentMapper.toCommentDto(itemService.addComment(userId, itemId, CommentMapper.toComment(commentDto)));
     }
 
     @DeleteMapping("{itemId}")

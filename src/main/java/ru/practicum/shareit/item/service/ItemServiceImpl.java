@@ -134,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public Comment add(Long userId, Long itemId, Comment comment) {
+    public Comment addComment(Long userId, Long itemId, Comment comment) {
         User author = userService.findById(userId);
         checkIfItemWasBookedByUser(itemId, userId);
         comment.setItem(findByItemId(itemId));
@@ -148,10 +148,11 @@ public class ItemServiceImpl implements ItemService {
         if (bookings.size() > 0) {
             Optional<Booking> lastBooking = bookings.stream()
                     .filter(booking -> currentTime.isAfter(booking.getEnd()))
-                    .min(Collections.reverseOrder());
+                    .sorted((Booking b1, Booking b2) -> b2.getEnd().compareTo(b1.getEnd()))
+                    .findFirst();
             Optional<Booking> nextBooking = bookings.stream()
                     .filter(booking -> currentTime.isBefore(booking.getStart()))
-                    .sorted()
+                    .sorted((Booking b1, Booking b2) -> b1.getStart().compareTo(b2.getStart()))
                     .findFirst();
             lastBooking.ifPresent(booking -> itemDtoWithBookings.setLastBooking(BookingMapper.toBookingDtoForItem(booking)));
             nextBooking.ifPresent(booking -> itemDtoWithBookings.setNextBooking(BookingMapper.toBookingDtoForItem(booking)));
