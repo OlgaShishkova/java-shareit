@@ -14,11 +14,11 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserService;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,22 +34,14 @@ import static org.hamcrest.Matchers.*;
 class ItemRequestServiceTest {
     @Mock
     private ItemRequestRepository mockItemRequestRepository;
-
-    @Mock
-    private UserService mockUserService;
-
-    @Mock
-    private ItemRepository mockItemRepository;
-
     private final ItemRequestService itemRequestService;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final ItemRequestRepository itemRequestRepository;
+    private final EntityManager em;
 
     @Test
     void testFindByRequestIdReturnsException() {
-        ItemRequestService itemRequestService =
-                new ItemRequestServiceImpl(mockItemRequestRepository, mockUserService, mockItemRepository);
         Mockito
                 .when(mockItemRequestRepository.findById(1L))
                 .thenReturn(Optional.empty());
@@ -61,33 +53,51 @@ class ItemRequestServiceTest {
 
     @Test
     void add() {
-    }
-
-    @Test
-    void findByUserId() {
         LocalDateTime created = LocalDateTime.now();
-        User user = new User(
+        User user = userRepository.save(new User(
                 null,
                 "user",
-                "user@email.ru"
+                "user@email.ru")
         );
-        userRepository.save(user);
-        ItemRequest itemRequest = new ItemRequest(
+        ItemRequest itemRequest = itemRequestService.add(new ItemRequest(
                 null,
                 "item request",
                 user,
-                created
+                created)
         );
-        itemRequestRepository.save(itemRequest);
-        Item item = new Item(
+
+        TypedQuery<ItemRequest> query = em.createQuery(
+                "Select i from ItemRequest i where i.id = :id", ItemRequest.class);
+        ItemRequest addedItemRequest = query.setParameter("id", itemRequest.getId()).getSingleResult();
+
+        assertThat(addedItemRequest.getId(), equalTo((itemRequest.getId())));
+        assertThat(addedItemRequest.getDescription(), equalTo(itemRequest.getDescription()));
+        assertThat(addedItemRequest.getRequestor().getId(), equalTo(itemRequest.getRequestor().getId()));
+        assertThat(addedItemRequest.getCreated(), equalTo(itemRequest.getCreated()));
+    }
+
+    @Test
+    void testFindByRequestId() {
+        LocalDateTime created = LocalDateTime.now();
+        User user = userRepository.save(new User(
+                null,
+                "user",
+                "user@email.ru")
+        );
+        ItemRequest itemRequest = itemRequestRepository.save(new ItemRequest(
+                null,
+                "item request",
+                user,
+                created)
+        );
+        Item item = itemRepository.save(new Item(
                 null,
                 "item",
                 "description",
                 true,
                 user,
-                itemRequest
+                itemRequest)
         );
-        itemRepository.save(item);
         ItemRequestDtoWithItems itemRequestDtoWithItems =
                 itemRequestService.findByRequestId(user.getId(), itemRequest.getId());
         assertThat(itemRequestDtoWithItems.getId(), is(itemRequest.getId()));
@@ -96,30 +106,38 @@ class ItemRequestServiceTest {
     }
 
     @Test
-    void findAll() {
+    void testFindByUserId() {
         LocalDateTime created = LocalDateTime.now();
-        User user = new User(
+        User user = userRepository.save(new User(
                 null,
                 "user",
-                "user@email.ru"
+                "user@email.ru")
         );
-        userRepository.save(user);
-        ItemRequest itemRequest = new ItemRequest(
+        itemRequestRepository.save(new ItemRequest(
                 null,
                 "item request",
                 user,
-                created
+                created)
         );
-        itemRequestRepository.save(itemRequest);
-        Item item = new Item(
+        List<ItemRequestDtoWithItems> itemRequests =
+                itemRequestService.findByUserId(user.getId());
+        assertThat(itemRequests, hasSize(1));
+    }
+
+    @Test
+    void testFindAll() {
+        LocalDateTime created = LocalDateTime.now();
+        User user = userRepository.save(new User(
                 null,
-                "item",
-                "description",
-                true,
-                user,
-                itemRequest
+                "user",
+                "user@email.ru")
         );
-        itemRepository.save(item);
+        itemRequestRepository.save(new ItemRequest(
+                null,
+                "item request",
+                user,
+                created)
+        );
         List<ItemRequestDtoWithItems> itemRequests =
                 itemRequestService.findAll(user.getId(), 0, 10);
         assertThat(itemRequests, hasSize(0));

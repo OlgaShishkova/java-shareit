@@ -30,12 +30,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleAlreadyExistException(UserAlreadyExistException e) {
-        log.error(e.getMessage(), e);
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler
     public ResponseEntity<Map<String, String>> handleUnsupportedStatusException(UnsupportedStatusException e) {
         return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.BAD_REQUEST);
     }

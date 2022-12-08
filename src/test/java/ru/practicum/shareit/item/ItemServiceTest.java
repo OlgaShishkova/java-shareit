@@ -60,23 +60,26 @@ public class ItemServiceTest {
 
     @Test
     void testAdd() {
-        User user = new User(null, "user", "user@email.ru");
-        userRepository.save(user);
-        User requestor = new User(null, "requestor", "requestor@email.ru");
-        userRepository.save(requestor);
+        User user = userRepository.save(new User(null, "user", "user@email.ru"));
+        User requestor = userRepository.save(new User(null, "requestor", "requestor@email.ru"));
         ItemRequest itemRequest = new ItemRequest(null, "itemRequest", requestor, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
-        Item item = new Item(null, "item", "description", true, user, itemRequest);
-        Item itemToAdd = itemService.add(item);
+        Item item = itemService.add(new Item(
+                null,
+                "item",
+                "description",
+                true,
+                user,
+                itemRequest));
 
         TypedQuery<Item> query = em.createQuery("Select i from Item i where i.id = :id", Item.class);
         Item addedItem = query.setParameter("id", item.getId()).getSingleResult();
 
-        assertThat(addedItem.getId(), equalTo((itemToAdd.getId())));
-        assertThat(addedItem.getName(), equalTo(itemToAdd.getName()));
-        assertThat(addedItem.getOwner().getId(), equalTo(itemToAdd.getOwner().getId()));
-        assertThat(addedItem.getDescription(), equalTo(itemToAdd.getDescription()));
-        assertThat(addedItem.getAvailable(), equalTo(itemToAdd.getAvailable()));
+        assertThat(addedItem.getId(), equalTo((item.getId())));
+        assertThat(addedItem.getName(), equalTo(item.getName()));
+        assertThat(addedItem.getOwner().getId(), equalTo(item.getOwner().getId()));
+        assertThat(addedItem.getDescription(), equalTo(item.getDescription()));
+        assertThat(addedItem.getAvailable(), equalTo(item.getAvailable()));
         assertThat(addedItem.getOwner(), equalTo(user));
         assertThat(addedItem.getRequest(), equalTo(itemRequest));
     }
@@ -278,21 +281,20 @@ public class ItemServiceTest {
 
     @Test
     void testFindByItemIdWithBookings() {
-        User user1 = new User(null, "user1", "user1@email.ru");
-        User user2 = new User(null, "user2", "user2@email.ru");
-        userRepository.save(user1);
-        userRepository.save(user2);
-        Item item1 = new Item(null, "item1", "item1Description", true, user1, null);
-        Item item2 = new Item(null, "item2", "item2Description", true, user1, null);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-        Booking booking1 = new Booking(null, LocalDateTime.now().minusDays(20), LocalDateTime.now().minusDays(10),
+        User user1 = userRepository.save(new User(null, "user1", "user1@email.ru"));
+        User user2 = userRepository.save(new User(null, "user2", "user2@email.ru"));
+        Item item1 = itemRepository.save(
+                new Item(null, "item1", "item1 description", true, user1, null));
+        Item item2 = itemRepository.save(
+                new Item(null, "item2", "item2 description", true, user1, null));
+        LocalDateTime currentTime = LocalDateTime.now();
+        Booking booking1 = new Booking(null,currentTime.minusDays(20), currentTime.minusDays(10),
                 item1, user2, Status.APPROVED);
-        Booking booking2 = new Booking(null, LocalDateTime.now().minusDays(5), LocalDateTime.now().minusDays(1),
+        Booking booking2 = new Booking(null, currentTime.minusDays(5), currentTime.minusDays(1),
                 item1, user2, Status.APPROVED);
-        Booking booking3 = new Booking(null, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(5),
+        Booking booking3 = new Booking(null,currentTime.plusDays(1), currentTime.plusDays(5),
                 item1, user2, Status.APPROVED);
-        Booking booking4 = new Booking(null, LocalDateTime.now().plusDays(7), LocalDateTime.now().plusDays(10),
+        Booking booking4 = new Booking(null, currentTime.plusDays(7), currentTime.plusDays(10),
                 item1, user2, Status.APPROVED);
         bookingRepository.save(booking1);
         bookingRepository.save(booking2);
@@ -302,5 +304,25 @@ public class ItemServiceTest {
 
         assertThat(itemDtoWithBookings.getLastBooking().getId(), equalTo(booking2.getId()));
         assertThat(itemDtoWithBookings.getNextBooking().getId(), equalTo(booking3.getId()));
+    }
+
+    @Test
+    void testFindByUserId() {
+        User user1 = userRepository.save(new User(null, "user1", "user1@email.ru"));
+        User user2 = userRepository.save(new User(null, "user2", "user2@email.ru"));
+        Item item1 = itemRepository.save(
+                new Item(null, "item1", "item1 description", true, user1, null));
+        Item item2 = itemRepository.save(
+                new Item(null, "item2", "item2 description", true, user1, null));
+        LocalDateTime currentTime = LocalDateTime.now();
+        Booking booking1 = bookingRepository.save(new Booking(
+                null, currentTime.minusDays(20), currentTime.minusDays(10), item1, user2, Status.APPROVED));
+        Booking booking2 = bookingRepository.save(new Booking(
+                null, currentTime.plusDays(5), currentTime.plusDays(10), item1, user2, Status.APPROVED));
+
+        List<ItemDtoWithBookings> items = itemService.findByUserId(user1.getId(), 0, 10);
+        assertThat(items, hasSize(2));
+        assertThat(items.get(0).getLastBooking().getId(), is(booking1.getId()));
+        assertThat(items.get(0).getNextBooking().getId(), is(booking2.getId()));
     }
 }

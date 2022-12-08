@@ -9,14 +9,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBookings;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -191,5 +195,37 @@ class ItemControllerTest {
         mvc.perform(delete("/items/{itemId}", 1)
                 .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testAddComment() throws Exception {
+        LocalDateTime created = LocalDateTime.now();
+        Comment comment = new Comment(
+                1L,
+                "comment",
+                new Item(),
+                new User(),
+                created
+        );
+        CommentDto commentDto = new CommentDto(
+                1L,
+                "comment",
+                "author",
+                created
+        );
+        when(itemService.addComment(anyLong(), anyLong(), any(Comment.class)))
+                .thenReturn(comment);
+
+        mvc.perform(post("/items/{itemId}/comment", 1)
+                        .header("X-Sharer-User-Id", 1)
+                        .content(mapper.writeValueAsString(commentDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(commentDto.getId()))
+                .andExpect(jsonPath("$.text").value(commentDto.getText()))
+                .andExpect(jsonPath("$.created")
+                        .value(commentDto.getCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))));
     }
 }
