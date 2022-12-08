@@ -177,7 +177,7 @@ public class ItemServiceTest {
 
     @Test
     void testFindByItemId() {
-        User user = new User(1L, "user", "user@email.ru");
+        User user = new User(null, "user", "user@email.ru");
         userRepository.save(user);
         Item item1 = new Item(null, "item1", "item1Description", true, user, null);
         Item item2 = new Item(null, "item2", "item2Description", false, user, null);

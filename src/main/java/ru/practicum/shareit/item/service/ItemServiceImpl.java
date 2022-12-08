@@ -148,12 +148,10 @@ public class ItemServiceImpl implements ItemService {
         if (bookings.size() > 0) {
             Optional<Booking> lastBooking = bookings.stream()
                     .filter(booking -> currentTime.isAfter(booking.getEnd()))
-                    .sorted((Booking b1, Booking b2) -> b2.getEnd().compareTo(b1.getEnd()))
-                    .findFirst();
+                    .min((Booking b1, Booking b2) -> b2.getEnd().compareTo(b1.getEnd()));
             Optional<Booking> nextBooking = bookings.stream()
                     .filter(booking -> currentTime.isBefore(booking.getStart()))
-                    .sorted((Booking b1, Booking b2) -> b1.getStart().compareTo(b2.getStart()))
-                    .findFirst();
+                    .min(Comparator.comparing(Booking::getStart));
             lastBooking.ifPresent(booking -> itemDtoWithBookings.setLastBooking(BookingMapper.toBookingDtoForItem(booking)));
             nextBooking.ifPresent(booking -> itemDtoWithBookings.setNextBooking(BookingMapper.toBookingDtoForItem(booking)));
         }
