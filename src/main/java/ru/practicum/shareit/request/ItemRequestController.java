@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping(path = "/requests")
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
+
     @PostMapping
     public ItemRequestDtoInput add(@RequestHeader("X-Sharer-User-Id") Long userId,
                                    @Valid @RequestBody ItemRequestDtoInput requestDto) {

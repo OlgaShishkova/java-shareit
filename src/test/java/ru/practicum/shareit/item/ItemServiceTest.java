@@ -255,7 +255,7 @@ public class ItemServiceTest {
         bookingRepository.save(booking);
         Comment comment = new Comment(null, "comment to item", item, null, null);
 
-        Assertions.assertThrows( NotAuthorisedRequestException.class,
+        Assertions.assertThrows(NotAuthorisedRequestException.class,
                 () -> itemService.addComment(user2.getId(), item.getId(), comment));
     }
 
@@ -272,7 +272,7 @@ public class ItemServiceTest {
         bookingRepository.save(booking);
         Comment comment = new Comment(null, "comment to item", item, null, null);
 
-        Assertions.assertThrows( NotAuthorisedRequestException.class,
+        Assertions.assertThrows(NotAuthorisedRequestException.class,
                 () -> itemService.addComment(user1.getId(), item.getId(), comment));
     }
 

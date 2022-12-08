@@ -37,13 +37,13 @@ class BookingControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    private final LocalDateTime BOOKING_START = LocalDateTime.now().plusDays(5);
-    private final LocalDateTime BOOKING_END = LocalDateTime.now().plusDays(10);
+    private final LocalDateTime bookingStart = LocalDateTime.now().plusDays(5);
+    private final LocalDateTime bookingEnd = LocalDateTime.now().plusDays(10);
 
     private final Booking booking = new Booking(
             1L,
-            BOOKING_START,
-            BOOKING_END,
+            bookingStart,
+            bookingEnd,
             new Item(
                     1L,
                     "item",
@@ -58,14 +58,14 @@ class BookingControllerTest {
 
     private final BookingDtoInput bookingDtoInput = new BookingDtoInput(
             null,
-            BOOKING_START,
-            BOOKING_END
+            bookingStart,
+            bookingEnd
     );
 
     private final BookingDtoOutput bookingDtoOutput = new BookingDtoOutput(
             1L,
-            BOOKING_START,
-            BOOKING_END,
+            bookingStart,
+            bookingEnd,
             new ItemDto(
                     1L,
                     "item",
@@ -103,7 +103,7 @@ class BookingControllerTest {
         when(bookingService.add(any(Booking.class)))
                 .thenReturn(booking);
 
-        bookingDtoInput.setEnd(BOOKING_START.minusDays(2));
+        bookingDtoInput.setEnd(bookingStart.minusDays(2));
         mvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", 2)
                         .content(mapper.writeValueAsString(bookingDtoInput))
@@ -118,7 +118,7 @@ class BookingControllerTest {
         when(bookingService.add(any(Booking.class)))
                 .thenReturn(booking);
 
-        bookingDtoInput.setEnd(BOOKING_START.minusDays(10));
+        bookingDtoInput.setEnd(bookingStart.minusDays(10));
         mvc.perform(post("/bookings")
                         .header("X-Sharer-User-Id", 2)
                         .content(mapper.writeValueAsString(bookingDtoInput))

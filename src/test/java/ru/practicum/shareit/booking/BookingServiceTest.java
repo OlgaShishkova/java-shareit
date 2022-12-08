@@ -37,6 +37,7 @@ class BookingServiceTest {
     private final ItemRepository itemRepository;
     private final BookingService bookingService;
     private final BookingRepository bookingRepository;
+
     @Test
     void testFindByIdReturnsException() {
         Mockito
