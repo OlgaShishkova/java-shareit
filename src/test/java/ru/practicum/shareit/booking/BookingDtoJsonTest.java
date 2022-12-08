@@ -31,8 +31,8 @@ public class BookingDtoJsonTest {
 
         assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.start")
-                .isEqualTo(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss")));
+                .isEqualTo(start.format(DateTimeFormatter.ISO_DATE_TIME));
         assertThat(result).extractingJsonPathStringValue("$.end")
-                .isEqualTo(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss")));
+                .isEqualTo(end.format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

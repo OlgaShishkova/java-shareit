@@ -226,6 +226,6 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.id").value(commentDto.getId()))
                 .andExpect(jsonPath("$.text").value(commentDto.getText()))
                 .andExpect(jsonPath("$.created")
-                        .value(commentDto.getCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))));
+                        .value(commentDto.getCreated().format(DateTimeFormatter.ISO_DATE_TIME)));
     }
 }

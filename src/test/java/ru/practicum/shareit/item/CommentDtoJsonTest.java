@@ -32,6 +32,6 @@ public class CommentDtoJsonTest {
         assertThat(result).extractingJsonPathStringValue("$.text").isEqualTo("comment");
         assertThat(result).extractingJsonPathStringValue("$.authorName").isEqualTo("author");
         assertThat(result).extractingJsonPathStringValue("$.created")
-                .isEqualTo(created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss")));
+                .isEqualTo(created.format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

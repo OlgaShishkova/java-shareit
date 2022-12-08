@@ -31,6 +31,6 @@ public class ItemRequestDtoJsonTest {
         assertThat(result).extractingJsonPathStringValue("$.description")
                 .isEqualTo("item request description");
         assertThat(result).extractingJsonPathStringValue("$.created")
-                .isEqualTo(created.format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss")));
+                .isEqualTo(created.format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

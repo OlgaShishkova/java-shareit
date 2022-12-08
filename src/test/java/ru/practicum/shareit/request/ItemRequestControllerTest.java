@@ -74,7 +74,7 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id").value(itemRequestDtoInput.getId()))
                 .andExpect(jsonPath("$.description").value(itemRequestDtoInput.getDescription()))
                 .andExpect(jsonPath("$.created").value(itemRequestDtoInput.getCreated()
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))));
+                        .format(DateTimeFormatter.ISO_DATE_TIME)));
     }
 
     @Test
@@ -89,7 +89,7 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].id").value(itemRequestDtoWithItems.getId()))
                 .andExpect(jsonPath("$[0].description").value(itemRequestDtoWithItems.getDescription()))
                 .andExpect(jsonPath("$[0].created").value(created
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))))
+                        .format(DateTimeFormatter.ISO_DATE_TIME)))
                 .andExpect(jsonPath("$[0].items", hasSize(1)));
     }
 
@@ -104,7 +104,7 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id").value(itemRequestDtoWithItems.getId()))
                 .andExpect(jsonPath("$.description").value(itemRequestDtoWithItems.getDescription()))
                 .andExpect(jsonPath("$.created").value(itemRequestDtoWithItems.getCreated()
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))));
+                        .format(DateTimeFormatter.ISO_DATE_TIME)));
     }
 
     @Test
@@ -119,7 +119,7 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$[0].id").value(itemRequestDtoWithItems.getId()))
                 .andExpect(jsonPath("$[0].description").value(itemRequestDtoWithItems.getDescription()))
                 .andExpect(jsonPath("$[0].created").value(created
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm:ss"))))
+                        .format(DateTimeFormatter.ISO_DATE_TIME)))
                 .andExpect(jsonPath("$[0].items", hasSize(1)));
     }
 }
