@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoInput;
 import ru.practicum.shareit.booking.dto.BookingDtoOutput;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.DateNotValidException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -23,7 +22,6 @@ public class BookingController {
     @PostMapping
     public BookingDtoOutput add(@RequestHeader("X-Sharer-User-Id") Long userId,
                                 @Valid @RequestBody BookingDtoInput bookingDto) {
-        validateBookingDates(bookingDto);
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.getBooker().setId(userId);
         booking.setStatus(Status.WAITING);
@@ -32,7 +30,7 @@ public class BookingController {
 
     @PatchMapping("{bookingId}")
     public BookingDtoOutput approve(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @PathVariable Long bookingId, @RequestParam Boolean approved) {
+                                    @PathVariable Long bookingId, @RequestParam Boolean approved) {
         return BookingMapper.toBookingDto(bookingService.approve(userId, bookingId, approved));
     }
 
@@ -43,23 +41,17 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoOutput> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @RequestParam(defaultValue = "ALL") String state,
-             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-             @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                         @RequestParam(defaultValue = "ALL") String state,
+                                         @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                         @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
         return BookingMapper.toBookingDto(bookingService.getAll(userId, state, from, size));
     }
 
     @GetMapping("owner")
     public List<BookingDtoOutput> getForAllItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                     @RequestParam(defaultValue = "ALL") String state,
-                                     @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                     @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                                 @RequestParam(defaultValue = "ALL") String state,
+                                                 @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                 @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
         return BookingMapper.toBookingDto(bookingService.getForAllItems(userId, state, from, size));
-    }
-
-    private void validateBookingDates(BookingDtoInput bookingDto) {
-        if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
-            throw new DateNotValidException("Дата окончания бронирования должна быть позже даты начала");
-        }
     }
 }

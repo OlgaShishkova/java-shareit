@@ -79,8 +79,7 @@ public class BookingServiceImpl implements BookingService {
         userService.findById(userId);
         List<Booking> bookings;
         LocalDateTime currentTime = LocalDateTime.now();
-        int page = from / size;
-        Pageable bookingPage = PageRequest.of(page, size, Sort.by("start").descending());
+        Pageable bookingPage = getPage(from, size, Sort.by("start").descending());
         switch (state) {
             case "ALL":
                 bookings = bookingRepository.findAllByBookerId(userId, bookingPage);
@@ -109,13 +108,17 @@ public class BookingServiceImpl implements BookingService {
         return bookings;
     }
 
+    private static Pageable getPage(Integer from, Integer size, Sort sort) {
+        int page = from / size;
+        return PageRequest.of(page, size, sort);
+    }
+
     @Override
     public List<Booking> getForAllItems(Long userId, String state, Integer from, Integer size) {
         userService.findById(userId);
         List<Booking> bookings;
         LocalDateTime currentTime = LocalDateTime.now();
-        int page = from / size;
-        Pageable bookingPage = PageRequest.of(page, size, Sort.by("start").descending());
+        Pageable bookingPage = getPage(from, size, Sort.by("start").descending());
         switch (state) {
             case "ALL":
                 bookings = bookingRepository.findAllByItemOwnerId(userId, bookingPage);

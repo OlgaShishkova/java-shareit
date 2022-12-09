@@ -122,4 +122,18 @@ class ItemRequestControllerTest {
                         .format(DateTimeFormatter.ISO_DATE_TIME)))
                 .andExpect(jsonPath("$[0].items", hasSize(1)));
     }
+
+    @Test
+    void testGetAllInvalidFromParameter() throws Exception {
+        mvc.perform(get("/requests/all?from={from}&size={size}", -5, 10)
+                .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testGetAllInvalidSizeParameter() throws Exception {
+        mvc.perform(get("/requests/all?from={from}&size={size}", 5, 0)
+                        .header("X-Sharer-User-Id", 1))
+                .andExpect(status().isBadRequest());
+    }
 }

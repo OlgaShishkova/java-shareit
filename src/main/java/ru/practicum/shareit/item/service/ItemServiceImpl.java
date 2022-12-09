@@ -73,8 +73,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDtoWithBookings> findByUserId(Long userId, Integer from, Integer size) {
         userService.findById(userId);
-        int page = from / size;
-        Pageable itemPage = PageRequest.of(page, size);
+        Pageable itemPage = getPageable(from, size);
         List<Item> items = itemRepository.findAllByOwnerId(userId, itemPage);
         List<ItemDtoWithBookings> itemsWithBookings = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.now();
@@ -95,6 +94,11 @@ public class ItemServiceImpl implements ItemService {
             itemsWithBookings.add(itemDtoWithBookings);
         }
         return itemsWithBookings;
+    }
+
+    private static Pageable getPageable(Integer from, Integer size) {
+        int page = from / size;
+        return PageRequest.of(page, size);
     }
 
     @Override
@@ -120,8 +124,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> search(String text, Integer from, Integer size) {
-        int page = from / size;
-        Pageable itemPage = PageRequest.of(page, size);
+        Pageable itemPage = getPageable(from, size);
         return itemRepository.search(text, itemPage);
     }
 
