@@ -74,7 +74,9 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDtoWithBookings> findByUserId(Long userId, Integer from, Integer size) {
         userService.findById(userId);
         Pageable itemPage = getPageable(from, size);
-        List<Item> items = itemRepository.findAllByOwnerId(userId, itemPage);
+        List<Item> items = itemRepository.findAllByOwnerId(userId, itemPage).stream()
+                .sorted(Comparator.comparing(Item::getId))
+                .collect(toList());
         List<ItemDtoWithBookings> itemsWithBookings = new ArrayList<>();
         LocalDateTime currentTime = LocalDateTime.now();
         Map<Item, List<Booking>> bookingsByItem =
