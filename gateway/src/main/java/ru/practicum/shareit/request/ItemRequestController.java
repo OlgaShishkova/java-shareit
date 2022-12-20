@@ -19,13 +19,13 @@ public class ItemRequestController {
     private final ItemRequestClient itemRequestClient;
 
     @PostMapping
-    public ResponseEntity<Object> addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ResponseEntity<Object> add(@RequestHeader("X-Sharer-User-Id") Long userId,
                               @Valid @RequestBody ItemRequestDto requestDto) {
         return itemRequestClient.add(userId, requestDto);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItemByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Object> getByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemRequestClient.findByUserId(userId);
     }
 
@@ -37,8 +37,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                                @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                @Positive @RequestParam(defaultValue = "10") Integer size) {
         return itemRequestClient.findAll(userId, from, size);
     }
 }

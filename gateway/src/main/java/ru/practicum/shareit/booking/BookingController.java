@@ -40,8 +40,8 @@ public class BookingController {
 	@GetMapping
 	public ResponseEntity<Object> getAll(@RequestHeader("X-Sharer-User-Id") Long userId,
 										 @RequestParam(name = "state", defaultValue = "all") String stateParam,
-										 @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-										 @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+										 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+										 @Positive @RequestParam(defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new UnsupportedStatusException("Unknown state: " + stateParam));
 		return bookingClient.getAll(userId, state, from, size);
@@ -50,8 +50,8 @@ public class BookingController {
 	@GetMapping("owner")
 	public ResponseEntity<Object> getForAllItems(@RequestHeader("X-Sharer-User-Id") Long userId,
 												 @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
-												 @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-												 @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+												 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+												 @Positive @RequestParam(defaultValue = "10") Integer size) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new UnsupportedStatusException("Unknown state: " + stateParam));
 		return bookingClient.getAllForOwner(userId, state, from, size);

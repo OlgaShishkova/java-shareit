@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -21,8 +20,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoWithBookings> getByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
-                                                 @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                                 @RequestParam(defaultValue = "0") Integer from,
+                                                 @RequestParam(defaultValue = "10") Integer size) {
         return itemService.findByUserId(userId, from, size);
     }
 
@@ -34,11 +33,8 @@ public class ItemController {
 
     @GetMapping("search")
     public List<ItemDto> search(@RequestParam String text,
-                                @RequestParam(required = false, defaultValue = "0") Integer from,
-                                @RequestParam(required = false, defaultValue = "10") Integer size) {
-        if (text.isBlank()) {
-            return Collections.emptyList();
-        }
+                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(defaultValue = "10") Integer size) {
         return ItemMapper.toItemDto(itemService.search(text, from, size));
     }
 

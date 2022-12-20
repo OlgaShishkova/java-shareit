@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Collections;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,8 +23,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                                 @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                                 @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                 @Positive @RequestParam(defaultValue = "10") Integer size) {
         return itemClient.getByUserId(userId, from, size);
     }
 
@@ -34,8 +36,11 @@ public class ItemController {
 
     @GetMapping("search")
     public ResponseEntity<Object> search(@RequestParam String text,
-                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer from,
-                                @Positive @RequestParam(required = false, defaultValue = "10") Integer size) {
+                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                @Positive @RequestParam(defaultValue = "10") Integer size) {
+        if (text.isBlank()) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
         return itemClient.search(text, from, size);
     }
 
